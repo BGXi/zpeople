@@ -1,0 +1,44 @@
+﻿.mt-50 {
+  display: block;
+  height: 50px;
+}
+
+.divider-line {
+  height: 1px;
+  width: 100%;
+  background-color: #909090;
+  box-shadow: -2px -2px 2px #666;
+}
+
+.flip-clock-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.text-big {
+  font-size: 100px;
+}
+
+.h100{
+  height: 100%;
+}
+
+[data-block="comment"]{
+  line-height: 48px;
+  font-size: 36px;
+}
+#idPeople{
+  height: 52px;
+  font-size: 36px;
+}
+#idPeople::-moz-placeholder,
+#idPeople::-webkit-input-placeholder,
+#idPeople::placeholder{
+  font-size: 36px;
+}
+#idPeople:focus::-webkit-input-placeholder {color: transparent}
+#idPeople:focus::-moz-placeholder          {color: transparent}
+#idPeople:focus:-moz-placeholder           {color: transparent}
+#idPeople:focus:-ms-input-placeholder      {color: transparent}
+#idPeople:focus::placeholder      {color: transparent}

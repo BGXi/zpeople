@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <title>MCNTelecom zPeople</title>
+  <!-- Material Design fonts -->
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <!-- Bootstrap -->
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha256-7s5uDGW3AHqw6xtJmNNtr+OBRJUlgkNJEo78P4b0yRw= sha512-nNo+yCHEyn0smMxSswnf/OnX6/KwJuZTlNZBjauKhTK0c+zT+q5JOCx0UFhXQ6rJR9jg6Es8gPuD2uZcYDLqSw=="
+        crossorigin="anonymous">
+
+  <!-- Bootstrap Material Design -->
+  <link href="css/bootstrap-material-design.css" rel="stylesheet">
+
+  <link href="css/ripples.min.css" rel="stylesheet">
+
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <link rel="icon" href="favicon.ico">
+
+</head>
+<body>
+<div class="mt-50"></div>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-lg-12 col-lg-12 text-center">
+      <h2>MCNTelecom zPeople</h2>
+    </div>
+    <div class="col-md-12 col-lg-12 text-center">
+
+      <div class="form-inline">
+        <div class="form-group col-md-12">
+          <label class="sr-only" for="idPeople">Введите свой идентификатор</label>
+          <div class="input-group col-md-4">
+            <input type="text" class="form-control text-center" id="idPeople" placeholder="Ваш идентификатор">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg">Запросить данные</button>
+        <button type="clear" class="btn btn-danger btn-lg" disabled>Сбросить поиск</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div class="divider-line"></div>
+<div class="container-fluid balance" style="display: none;">
+  <div class="row">
+    <div class="col-md-12 text-center">
+      <div class="col-md-6 text-center alert-success h100">
+        <h2 class="text-success">Переработки</h2>
+        <div class="text-big text-success" data-block="overtime"></div>
+      </div>
+      <div class="col-md-6 text-center alert-danger h100">
+        <h2 class="text-danger">Недоработки</h2>
+        <div class="text-big text-danger" data-block="devtime"></div>
+      </div>
+    </div>
+    <div class="col-md-12 text-center alert-info">
+      <h2 class="text-info">Баланс времени</h2>
+      <div class="text-big text-info" data-block="balance-time"></div>
+    </div>
+  </div>
+</div>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12 text-center comment">
+      <div data-block="comment"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ------------------------------------------------------------------- scripts -----------------------------------------------------------------------  -->
+	<script src="https://yastatic.net/jquery/2.1.4/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha256-KXn5puMvxCw+dAYznun+drMdG1IFl3agK0p/pqT9KAo= sha512-2e8qq0ETcfWRI4HJBzQiA3UoyFk6tbNyG+qSaIBZLyW9Xf3sWZHN/lxe9fTh1U45DpPf07yj94KsUHHWe4Yk1A==" crossorigin="anonymous"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
