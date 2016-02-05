@@ -3,14 +3,14 @@ jQuery(function ($) {
   var timeLog = [];
   var date = new Date();
   var currentMonth = date.getMonth() + 1;
-  var jsonFileName = date.getFullYear() + '-' + ((currentMonth < 10)? '0' + currentMonth : currentMonth);
+  var jsonFileName = date.getFullYear() + '-' + ((currentMonth < 10) ? '0' + currentMonth : currentMonth);
 
   $.ajax({
-    url: '/zoho-data/'+jsonFileName + '.json',
+    url: '/zoho-data/' + jsonFileName + '.json',
     dataType: 'json',
     success: function (date) {
       timeLog = date;
-        //если есть хеш в адресе #Number, то сразу подставляеться и расчитываеться для пользователя
+      //если есть хеш в адресе #Number, то сразу подставляеться и расчитываеться для пользователя
 
       if (window.location.hash) {
         $('#idPeople').val(window.location.hash.replace(/\D/g, ''));
@@ -19,7 +19,6 @@ jQuery(function ($) {
 
     }
   });
- 
 
 // events
 
@@ -76,7 +75,7 @@ jQuery(function ($) {
       $('[data-block="devtime"]').text(getTime(devTime));
 
     } else {
-      clearPeople();      
+      clearPeople();
     }
 
   }
