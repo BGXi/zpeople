@@ -96,8 +96,8 @@ jQuery(function ($) {
   }
 
   function getTime(time) {
-    m = Math.ceil((time % 3600) / 60);
-    return Math.floor(time / 3600) + ':' + ((m < 10) ? ('0' + m) : m);
+    var m = Math.ceil((time % 3600) / 60);
+    return Math.floor(time / 3600) + ((m === 60 ) ? 1 : 0) + ':' + ((m === 60 ) ? '00' : ((m < 10) ? ('0' + m) : m));
   }
 
   function clearPeople() {
