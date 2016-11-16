@@ -13,7 +13,7 @@ jQuery(function ($) {
   setCurrentDay();
 
   $.ajax({
-    url: 'zoho-data/' + jsonFileName + '.json',
+    url: './zoho-data/' + jsonFileName + '.json',
     cache: false,
     dataType: 'json',
     success: function (date) {
@@ -87,6 +87,7 @@ jQuery(function ($) {
       $('[data-block="devtime"]').text(getTime(devTime));
 
       if (workTimeList && workTimeList.length>1){
+        console.log();
         goShowGraph(getPeopleTimeLog(idPeople));
       }
 
@@ -148,7 +149,7 @@ jQuery(function ($) {
     var dfd = $.Deferred();
 
     $.ajax({
-      url: 'zoho-data/' + item + '.json',
+      url: './zoho-data/' + item + '.json',
       cache: false,
       dataType: 'json',
       success: function (data) {
@@ -162,7 +163,9 @@ jQuery(function ($) {
 
   function everythingDone(){
     workTimeList.sort(dynamicSort("day"));
-    goShowGraph(getPeopleTimeLog(267));
+    if (window.location.hash) {
+      goShowGraph(getPeopleTimeLog(window.location.hash.replace(/\D/g, '')));
+    }
   }
 
   function setCurrentDay() {
@@ -221,6 +224,9 @@ jQuery(function ($) {
     $('#js-chart').html('');
 
     $('#js-chart').highcharts({
+      chart: {
+        type: 'area'
+      },
       title: {
         text: 'Данные на текущий момент',
         x: -20 //center
@@ -270,9 +276,27 @@ jQuery(function ($) {
     var series = [];
 
     series.push(
-      {name: 'Переработки', data: timeLogPeople.map(function(overT){return strTimeToFloat(overT.overTime, 'H.MM');})},
-      {name: 'Недоработки', data: timeLogPeople.map(function(devT){return strTimeToFloat(devT.devTime);})},
-      {name: 'Баланс', data: timeLogPeople.map(function(balance){return strTimeToFloat(balance.balance);})}
+      {
+        name: 'Переработки',
+        data: timeLogPeople.map(function (overT) {
+          return strTimeToFloat(overT.overTime, 'H.MM');
+        }),
+        color: '#4caf50'
+      },
+      {
+        name: 'Недоработки',
+        data: timeLogPeople.map(function (devT) {
+          return strTimeToFloat(devT.devTime);
+        }),
+        color: '#f44336'
+      },
+      {
+        name: 'Баланс',
+        data: timeLogPeople.map(function (balance) {
+          return strTimeToFloat(balance.balance);
+        }),
+        color: '#03a9f4'
+      }
     );
 
     return series;
