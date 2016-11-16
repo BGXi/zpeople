@@ -1,12 +1,20 @@
 jQuery(function ($) {
 
-  var timeLog = [];
-  var date = new Date();
+  var m = moment();
+  m.locale('ru'); //set russian
+
+  var timeLog = []; // текущий день
+  var date = new Date(); // текущая дата
   var currentMonth = date.getMonth() + 1;
-  var jsonFileName = date.getFullYear() + '-' + ((currentMonth < 10) ? '0' + currentMonth : currentMonth);
+  var currentDay = parseInt(moment().format('D'));
+  var jsonFileName = date.getFullYear() + '-' + getNumberWithPrefix(currentMonth);
+  var workTimeList = [];
+
+  setCurrentDay();
 
   $.ajax({
-    url: '/zoho-data/' + jsonFileName + '.json',
+    url: 'zoho-data/' + jsonFileName + '.json',
+    cache: false,
     dataType: 'json',
     success: function (date) {
       timeLog = date;
@@ -17,8 +25,11 @@ jQuery(function ($) {
         searchPeople();
       }
 
+      getAllDays(); // загружаем все дни которые есть за текущий месяц
+
     }
   });
+
 
 // events
 
@@ -62,6 +73,7 @@ jQuery(function ($) {
       var overTime = people.overTime_tsecs;
 
       $('[data-block="balance-time"]').text(balance(overTime, devTime));
+
       switch (balance(overTime, devTime)[0]) {
         case '-':
           $('[data-block="comment"]').text('Работайте лучше и больше.');
@@ -73,6 +85,10 @@ jQuery(function ($) {
 
       $('[data-block="overtime"]').text(getTime(overTime));
       $('[data-block="devtime"]').text(getTime(devTime));
+
+      if (workTimeList && workTimeList.length>1){
+        goShowGraph(getPeopleTimeLog(idPeople));
+      }
 
     } else {
       clearPeople();
@@ -95,6 +111,11 @@ jQuery(function ($) {
     return sign + getTime(time);
   }
 
+  function getNumberWithPrefix(number){
+    return (number < 10) ? '0' + number : number;
+  }
+
+
   function getTime(time) {
     var m = Math.ceil((time % 3600) / 60);
     return Math.floor(time / 3600) + ((m === 60 ) ? 1 : 0) + ':' + ((m === 60 ) ? '00' : ((m < 10) ? ('0' + m) : m));
@@ -108,6 +129,157 @@ jQuery(function ($) {
     $('.balance').hide();
     $('button[type="clear"]').attr('disabled', true);
     window.location.hash = '';
+  }
+
+  function getAllDays() {
+
+    var processItemsDeferred = []; // для проверки зарузки всех данных по дням
+
+    for (var day = 1; day <= currentDay; day++) {
+      processItemsDeferred.push(processItem(jsonFileName + '-' + getNumberWithPrefix(day)));
+    }
+
+    $.when.apply($, processItemsDeferred).then(everythingDone);
+
+  }
+
+  function processItem(item) {
+
+    var dfd = $.Deferred();
+
+    $.ajax({
+      url: 'zoho-data/' + item + '.json',
+      cache: false,
+      dataType: 'json',
+      success: function (data) {
+        workTimeList.push({'day': item, 'data': data});
+        dfd.resolve()
+      }
+    });
+
+    return dfd.promise();
+  }
+
+  function everythingDone(){
+    workTimeList.sort(dynamicSort("day"));
+    goShowGraph(getPeopleTimeLog(267));
+  }
+
+  function setCurrentDay() {
+    $('.current-data').text(m.format('l'));
+    setTimeout(checkDate, 60000);
+  }
+
+  function checkDate(){
+    var $txtDate = $('.current-data');
+
+    if ($txtDate.text() != m.format('l')){
+      $('.current-day').html('<div class="alert-danger text-warning">Надо обновить страницу дата сменилась!</div>');
+    } else {
+      $('.current-day').html('На дату: <span class="current-data">' + m.format('l') + '</span>');
+      setTimeout(checkDate, 60000);
+    }
+  }
+
+
+  function getPeopleTimeLog(idPeople) {
+    var peopleWorkMonth = [];
+
+    workTimeList.forEach(function (oneDayLog) {
+
+      var oneDay = oneDayLog.data.find(function (item) {
+        return item.empId == idPeople + '';
+      });
+
+      peopleWorkMonth.push(
+        {
+          "day": oneDayLog.day,
+          "overTime": getTime(oneDay.overTime_tsecs),
+          "devTime": getTime(oneDay.devTime_tsecs),
+          "balance": balance(oneDay.overTime_tsecs, oneDay.devTime_tsecs)
+        }
+      );
+    });
+
+    return peopleWorkMonth;
+  }
+
+  function dynamicSort(property) { //sort array obj field
+    var sortOrder = 1;
+    if(property[0] === "-") {
+      sortOrder = -1;
+      property = property.substr(1);
+    }
+    return function (a,b) {
+      var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+      return result * sortOrder;
+    }
+  }
+
+  function goShowGraph(timeLogPeople) {
+
+    $('#js-chart').html('');
+
+    $('#js-chart').highcharts({
+      title: {
+        text: 'Данные на текущий момент',
+        x: -20 //center
+      },
+      subtitle: {
+        text: 'Source: http://propusk.itpark.mcn.ru/zpeople/',
+        x: -10
+      },
+      xAxis: {
+        type: 'datetime',
+        categories: getCategories(timeLogPeople)
+      },
+      yAxis: {
+        title: {
+          text: 'Время ( ЧЧ : ММ )'
+        },
+        plotLines: [{
+          value: 0,
+          width: 1,
+          color: '#808080'
+        }],
+        allowDecimals: false,
+        ordinal: false
+      },
+      tooltip: {
+        valueSuffix: ' ч'
+      },
+      legend: {
+        layout: 'vertical',
+        align: 'right',
+        verticalAlign: 'middle',
+        borderWidth: 0
+      },
+      series: getSeries(timeLogPeople)
+    });
+
+  }
+
+  function getCategories(timeLogPeople) {
+    return timeLogPeople.map(function(item){
+      return item.day;
+    });
+  }
+
+  function getSeries(timeLogPeople) {
+
+    var series = [];
+
+    series.push(
+      {name: 'Переработки', data: timeLogPeople.map(function(overT){return strTimeToFloat(overT.overTime, 'H.MM');})},
+      {name: 'Недоработки', data: timeLogPeople.map(function(devT){return strTimeToFloat(devT.devTime);})},
+      {name: 'Баланс', data: timeLogPeople.map(function(balance){return strTimeToFloat(balance.balance);})}
+    );
+
+    return series;
+  }
+
+  function strTimeToFloat(strTime){
+    return parseFloat(strTime.split(":")[0]+'.'+strTime.split(":")[1]);
   }
 
 });
