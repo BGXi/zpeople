@@ -13,7 +13,7 @@ jQuery(function ($) {
   setCurrentDay();
 
   $.ajax({
-    url: '/zoho-data/' + jsonFileName + '.json',
+    url: './zoho-data/' + jsonFileName + '.json',
     cache: false,
     dataType: 'json',
     success: function (date) {
@@ -148,7 +148,7 @@ jQuery(function ($) {
     var dfd = $.Deferred();
 
     $.ajax({
-      url: '/zoho-data/' + item + '.json',
+      url: './zoho-data/' + item + '.json',
       cache: false,
       dataType: 'json',
       success: function (data) {
@@ -162,6 +162,9 @@ jQuery(function ($) {
 
   function everythingDone(){
     workTimeList.sort(dynamicSort("day"));
+    if (window.location.hash) {
+      goShowGraph(getPeopleTimeLog(window.location.hash.replace(/\D/g, '')));
+    }
   }
 
   function setCurrentDay() {
@@ -220,6 +223,9 @@ jQuery(function ($) {
     $('#js-chart').html('');
 
     $('#js-chart').highcharts({
+      chart: {
+        type: 'area'
+      },
       title: {
         text: 'Данные на текущий момент',
         x: -20 //center
