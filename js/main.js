@@ -13,7 +13,7 @@ jQuery(function ($) {
   setCurrentDay();
 
   $.ajax({
-    url: './zoho-data/' + jsonFileName + '.json',
+    url: '/zoho-data/' + jsonFileName + '.json',
     cache: false,
     dataType: 'json',
     success: function (date) {
@@ -128,6 +128,7 @@ jQuery(function ($) {
     $('[data-block="comment"]').text('');
     $('.balance').hide();
     $('button[type="clear"]').attr('disabled', true);
+    $('#js-chart').html('');
     window.location.hash = '';
   }
 
@@ -148,7 +149,7 @@ jQuery(function ($) {
     var dfd = $.Deferred();
 
     $.ajax({
-      url: './zoho-data/' + item + '.json',
+      url: '/zoho-data/' + item + '.json',
       cache: false,
       dataType: 'json',
       success: function (data) {
@@ -174,7 +175,7 @@ jQuery(function ($) {
 
   function checkDate(){
     var $txtDate = $('.current-data');
-
+    console.log('minute.... '+m.format('l'));
     if ($txtDate.text() != m.format('l')){
       $('.current-day').html('<div class="alert-danger text-warning">Надо обновить страницу дата сменилась!</div>');
     } else {
