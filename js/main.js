@@ -13,7 +13,7 @@ jQuery(function ($) {
   setCurrentDay();
 
   $.ajax({
-    url: './zoho-data/' + jsonFileName + '.json',
+    url: '/zoho-data/' + jsonFileName + '.json',
     cache: false,
     dataType: 'json',
     success: function (date) {
@@ -148,7 +148,7 @@ jQuery(function ($) {
     var dfd = $.Deferred();
 
     $.ajax({
-      url: './zoho-data/' + item + '.json',
+      url: '/zoho-data/' + item + '.json',
       cache: false,
       dataType: 'json',
       success: function (data) {
