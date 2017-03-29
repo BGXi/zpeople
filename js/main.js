@@ -7,7 +7,7 @@ jQuery(function ($) {
   var date = new Date(); // текущая дата
   var currentMonth = date.getMonth() + 1;
   var currentDay = parseInt(moment().format('D'));
-  var jsonFileName = date.getFullYear() + '-' + getNumberWithPrefix(currentMonth);
+  var jsonFileName = moment().format('YYYY-MM');
   var workTimeList = [];
 
   setCurrentDay();
@@ -18,14 +18,9 @@ jQuery(function ($) {
     dataType: 'json',
     success: function (date) {
       timeLog = date;
-      //если есть хеш в адресе #Number, то сразу подставляеться и расчитываеться для пользователя
 
-      if (window.location.hash) {
-        $('#idPeople').val(window.location.hash.replace(/\D/g, ''));
-        searchPeople();
-      }
-
-      getAllDays(); // загружаем все дни которые есть за текущий месяц
+      //получение данных по прогуленным дням
+      getPresentDays();
 
     }
   });
@@ -169,42 +164,44 @@ jQuery(function ($) {
   }
 
   function setCurrentDay() {
-    $('.current-data').text(m.format('l'));
+    $('.current-data').text(m.format('L'));
     setTimeout(checkDate, 60000);
   }
 
   function checkDate(){
     var $txtDate = $('.current-data');
-    console.log('minute.... '+m.format('l'));
-    if ($txtDate.text() != m.format('l')){
+    if ($txtDate.text() != m.format('L')){
       $('.current-day').html('<div class="alert-danger text-warning">Надо обновить страницу дата сменилась!</div>');
     } else {
-      $('.current-day').html('На дату: <span class="current-data">' + m.format('l') + '</span>');
+      $('.current-day').html('На дату: <span class="current-data">' + m.format('L') + '</span>');
       setTimeout(checkDate, 60000);
     }
   }
 
-
   function getPeopleTimeLog(idPeople) {
     var peopleWorkMonth = [];
-
-    workTimeList.forEach(function (oneDayLog) {
+    workTimeList.forEach(function (oneDayLog, iDay) {
 
       var oneDay = oneDayLog.data.find(function (item) {
         return item.empId == idPeople + '';
       });
-
       peopleWorkMonth.push(
         {
           "day": oneDayLog.day,
-          "overTime": getTime(oneDay.overTime_tsecs),
-          "devTime": getTime(oneDay.devTime_tsecs),
-          "balance": balance(oneDay.overTime_tsecs, oneDay.devTime_tsecs)
+          "overTime": (isPresence(idPeople, iDay)) ? getTime(oneDay.overTime_tsecs) : "0",
+          "devTime": (isPresence(idPeople, iDay)) ? getTime(oneDay.devTime_tsecs) : "0",
+          "balance": (isPresence(idPeople, iDay)) ? balance(oneDay.overTime_tsecs, oneDay.devTime_tsecs) : "0"
         }
       );
     });
 
     return peopleWorkMonth;
+  }
+
+  function isPresence(idPeople,iDay) {
+    return (presenceLog.find(function (emplItem) {
+      return emplItem.empId == idPeople + '';
+    })[iDay].isAbsent !== true)
   }
 
   function dynamicSort(property) { //sort array obj field
@@ -304,6 +301,27 @@ jQuery(function ($) {
 
   function strTimeToFloat(strTime){
     return parseFloat(strTime.split(":")[0]+'.'+strTime.split(":")[1]);
+  }
+
+  function getPresentDays() {
+    $.ajax({
+      url: '/zoho-data/' + jsonFileName + '-presence' + '.json',
+      cache: false,
+      dataType: 'json',
+      success: function (date) {
+        presenceLog = date;
+
+        //если есть хеш в адресе #Number, то сразу подставляеться и расчитываеться для пользователя
+
+        if (window.location.hash) {
+          $('#idPeople').val(window.location.hash.replace(/\D/g, ''));
+          searchPeople();
+        }
+
+        getAllDays(); // загружаем все дни которые есть за текущий месяц
+
+      }
+    });
   }
 
 });
