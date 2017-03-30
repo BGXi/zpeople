@@ -25,7 +25,6 @@ jQuery(function ($) {
     }
   });
 
-
 // events
 
   $('button[type="submit"]').on({
@@ -81,7 +80,7 @@ jQuery(function ($) {
       $('[data-block="overtime"]').text(getTime(overTime));
       $('[data-block="devtime"]').text(getTime(devTime));
 
-      if (workTimeList && workTimeList.length>1){
+      if (workTimeList && workTimeList.length > 1) {
         goShowGraph(getPeopleTimeLog(idPeople));
       }
 
@@ -106,10 +105,9 @@ jQuery(function ($) {
     return sign + getTime(time);
   }
 
-  function getNumberWithPrefix(number){
+  function getNumberWithPrefix(number) {
     return (number < 10) ? '0' + number : number;
   }
-
 
   function getTime(time) {
     var m = Math.ceil((time % 3600) / 60);
@@ -156,7 +154,7 @@ jQuery(function ($) {
     return dfd.promise();
   }
 
-  function everythingDone(){
+  function everythingDone() {
     workTimeList.sort(dynamicSort("day"));
     if (window.location.hash) {
       goShowGraph(getPeopleTimeLog(window.location.hash.replace(/\D/g, '')));
@@ -168,9 +166,10 @@ jQuery(function ($) {
     setTimeout(checkDate, 60000);
   }
 
-  function checkDate(){
+  function checkDate() {
     var $txtDate = $('.current-data');
-    if ($txtDate.text() != m.format('L')){
+    console.log('minute.... ' + m.format('L'));
+    if ($txtDate.text() != m.format('L')) {
       $('.current-day').html('<div class="alert-danger text-warning">Надо обновить страницу дата сменилась!</div>');
     } else {
       $('.current-day').html('На дату: <span class="current-data">' + m.format('L') + '</span>');
@@ -180,6 +179,7 @@ jQuery(function ($) {
 
   function getPeopleTimeLog(idPeople) {
     var peopleWorkMonth = [];
+    var currentDay = parseInt(moment().format('D')) - 1;//первый день === 0
     workTimeList.forEach(function (oneDayLog, iDay) {
 
       var oneDay = oneDayLog.data.find(function (item) {
@@ -188,9 +188,9 @@ jQuery(function ($) {
       peopleWorkMonth.push(
         {
           "day": oneDayLog.day,
-          "overTime": (isPresence(idPeople, iDay)) ? getTime(oneDay.overTime_tsecs) : "0",
-          "devTime": (isPresence(idPeople, iDay)) ? getTime(oneDay.devTime_tsecs) : "0",
-          "balance": (isPresence(idPeople, iDay)) ? balance(oneDay.overTime_tsecs, oneDay.devTime_tsecs) : "0"
+          "overTime": (isPresence(idPeople, iDay) || currentDay === iDay) ? getTime(oneDay.overTime_tsecs) : "0",
+          "devTime": (isPresence(idPeople, iDay) || currentDay === iDay) ? getTime(oneDay.devTime_tsecs) : "0",
+          "balance": (isPresence(idPeople, iDay) || currentDay === iDay) ? balance(oneDay.overTime_tsecs, oneDay.devTime_tsecs) : "0"
         }
       );
     });
@@ -198,19 +198,19 @@ jQuery(function ($) {
     return peopleWorkMonth;
   }
 
-  function isPresence(idPeople,iDay) {
+  function isPresence(idPeople, iDay) {
     return (presenceLog.find(function (emplItem) {
       return emplItem.empId == idPeople + '';
-    })[iDay].isAbsent !== true)
+    })[iDay].isAbsent !== true);
   }
 
   function dynamicSort(property) { //sort array obj field
     var sortOrder = 1;
-    if(property[0] === "-") {
+    if (property[0] === "-") {
       sortOrder = -1;
       property = property.substr(1);
     }
-    return function (a,b) {
+    return function (a, b) {
       var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
       return result * sortOrder;
     }
@@ -263,7 +263,7 @@ jQuery(function ($) {
   }
 
   function getCategories(timeLogPeople) {
-    return timeLogPeople.map(function(item){
+    return timeLogPeople.map(function (item) {
       return item.day;
     });
   }
@@ -299,8 +299,8 @@ jQuery(function ($) {
     return series;
   }
 
-  function strTimeToFloat(strTime){
-    return parseFloat(strTime.split(":")[0]+'.'+strTime.split(":")[1]);
+  function strTimeToFloat(strTime) {
+    return parseFloat(strTime.split(":")[0] + '.' + strTime.split(":")[1]);
   }
 
   function getPresentDays() {
