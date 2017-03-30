@@ -312,7 +312,6 @@ jQuery(function ($) {
         presenceLog = date;
 
         //если есть хеш в адресе #Number, то сразу подставляеться и расчитываеться для пользователя
-
         if (window.location.hash) {
           $('#idPeople').val(window.location.hash.replace(/\D/g, ''));
           searchPeople();
